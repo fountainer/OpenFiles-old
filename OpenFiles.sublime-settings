@@ -1,0 +1,5 @@
+{
+  //
+  "ignored_extensions": [".pdf", ".exe", ".synctex.gz", ".aux", ".bbl", ".blg",
+  ".log"]
+}

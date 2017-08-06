@@ -2,6 +2,10 @@ import sublime, sublime_plugin
 import os
 from os.path import join
 
+settings = sublime.load_settings("OpenFiles.sublime-settings")
+ignored_extensions = tuple(settings.get("ignored_extensions", ()))
+
+
 class OpenFilesCommand(sublime_plugin.TextCommand):
     def run(self, edit, path = None):
         files, folders, path = self.get_files_folders(path)
@@ -28,4 +32,8 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
         entries = os.listdir(path)
         files = [file for file in entries if os.path.isfile(join(path, file))]
         folders = list(set(entries) - set(files))
+        # must after folders = list(set(entries) - set(files))
+        files = [file for file in files if not file.lower().endswith(ignored_extensions)]
         return((files, folders, path))
+
+
