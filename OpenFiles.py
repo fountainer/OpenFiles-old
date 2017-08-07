@@ -6,22 +6,39 @@ from os.path import join
 class OpenFilesCommand(sublime_plugin.TextCommand):
     def run(self, edit, path = None):
         files, folders, path = self.get_files_folders(path)
-        entries = [folder + "/" for folder in folders] + files
-        if not entries:
-            sublime.message_dialog("Empty folder!")
-            return 
+        entries = folders + files
+        # show in the quick panel
+        entries_display = [folder + "/" for folder in folders] + files
+        is_root_dir = True
+        path_parent = os.path.dirname(path)
+        if path != path_parent:
+            is_root_dir = False
+            # insert a placeholder
+            entries = [""] + entries
+            # parent directory symbol
+            entries_display = [".."] + entries_display
         window = self.view.window()
 
         def on_done(index):
-            if index >= len(folders):
+            # open files
+            if index > (len(folders) - is_root_dir):
                 window.open_file(join(path, entries[index]))
-            elif (index >= 0):
-                sub_path = join(path, entries[index])
-                window.run_command("open_files", {"path": sub_path})
+            # open subdirectory
+            elif index > 0:
+                next_path = join(path, entries[index])
+                window.run_command("open_files", {"path": next_path})
+            # open subdirectory
+            elif index == 0 and is_root_dir:
+                next_path = join(path, entries[index])
+                window.run_command("open_files", {"path": next_path})
+            # open parent directory
+            elif index == 0 and not is_root_dir:
+                next_path = path_parent
+                window.run_command("open_files", {"path": next_path})
             else:
                 pass
 
-        window.show_quick_panel(entries, on_done)
+        window.show_quick_panel(entries_display, on_done)
 
     def get_files_folders(self, path = None):
         if path is None:
