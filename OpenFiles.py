@@ -53,4 +53,19 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
         files = [file for file in files if not file.lower().endswith(ignored_extensions)]
         return((files, folders, path))
 
+class OpenBookMarksCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        settings = sublime.load_settings("OpenFiles.sublime-settings")
+        bookmarks = settings.get("bookmarks", [])
+        if not bookmarks:
+            sublime.message_dialog("Empty bookmark")
+        names_bm = [list(bookmark.keys())[0] for bookmark in bookmarks]
+        path_bm = [list(bookmark.values())[0] for bookmark in bookmarks]
+        window = self.view.window()
 
+        def on_done(index):
+            if index >= 0:
+                window.run_command("open_files", {"path": path_bm[index]})
+            else:
+                pass
+        window.show_quick_panel(names_bm, on_done)
