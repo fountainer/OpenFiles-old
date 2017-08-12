@@ -43,7 +43,10 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
     def get_files_folders(self, path = None):
         if path is None:
             path = os.path.dirname(self.view.file_name())
-        entries = os.listdir(path)
+        try:
+            entries = os.listdir(path)
+        except FileNotFoundError as fnfe:
+            sublime.error_message(str(fnfe))
         files = [file for file in entries if os.path.isfile(join(path, file))]
         folders = list(set(entries) - set(files))
         # can not place it in the global environment, because it run only once?
@@ -61,6 +64,8 @@ class OpenBookMarksCommand(sublime_plugin.TextCommand):
             sublime.message_dialog("Empty bookmark")
         names_bm = [list(bookmark.keys())[0] for bookmark in bookmarks]
         path_bm = [list(bookmark.values())[0] for bookmark in bookmarks]
+        pkg_path = sublime.packages_path()
+        path_bm = [path if os.path.isabs(path) else join(pkg_path, path) for path in path_bm]
         window = self.view.window()
 
         def on_done(index):

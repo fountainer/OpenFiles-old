@@ -4,8 +4,8 @@
   ".log"],
   "bookmarks":
   [
-    {"Open Files plugins": "D:/softwares/Sublime Text 3/Data/Packages/OpenFiles"},
     {"R Code": "D:/Projects/R code"},
-    {"LaTex Article": "D:/Projects/LaTex/Article"}
+    {"LaTex Article": "D:/Projects/LaTex/Article"},
+    {"Open Files - Sublime Package": "OpenFiles"},
   ]
 }

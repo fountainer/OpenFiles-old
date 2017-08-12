@@ -4,6 +4,7 @@ Press `ctrl + shift + o` to display the files and folders in the current folder
 in the quick panel. Select a file and open it or select and display a subdirectory.
 
 Press `ctrl + alt + b` to display the bookmarks which can be specified in the settings.
+Support paths relative to the sublime package path.
 
 ### ToDO
 
