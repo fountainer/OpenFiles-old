@@ -6,5 +6,15 @@
   {
     "keys": ["ctrl+alt+b"],
     "command": "open_book_marks"
+  },
+  {
+    "keys": ["tab"],
+    "command": "open_files_choose_menu",
+    "context": [{"key": "open_files_choose_menu"}]
+  },
+  {
+    "keys": ["right"],
+    "command": "open_files_choose_menu",
+    "context": [{"key": "open_files_choose_menu"}]
   }
 ]
