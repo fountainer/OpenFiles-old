@@ -20,3 +20,5 @@ to Clipboard" and "Open in Application". Open pdf files and Excel files.
 
 Open quick panel / Open manu / Press left / then choose folder
 The last choose folder action does not work?????
+
+Use develop version to fix it.
