@@ -4,6 +4,11 @@
     "command": "open_files"
   },
   {
+    "keys": ["ctrl+shift+alt+o"],
+    "command": "open_files",
+    "args": {"ignore": false}
+  },
+  {
     "keys": ["ctrl+alt+b"],
     "command": "open_book_marks"
   },
