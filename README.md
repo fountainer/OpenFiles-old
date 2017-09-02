@@ -15,3 +15,8 @@ to Clipboard" and "Open in Application". Open pdf files and Excel files.
 - Fix bookmarks tab action
 - [Sublime Files](https://packagecontrol.io/packages/Sublime%20Files)
 - [File navigator](https://packagecontrol.io/packages/File%20Navigator)
+
+### Bugs
+
+Open quick panel / Open manu / Press left / then choose folder
+The last choose folder action does not work?????

@@ -21,5 +21,10 @@
     "keys": ["right"],
     "command": "open_files_choose_menu",
     "context": [{"key": "open_files_choose_menu"}]
+  },
+  {
+    "keys": ["left"],
+    "command": "open_files_backward",
+    "context": [{"key": "open_files_backward"}]
   }
 ]
