@@ -30,24 +30,24 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
         self.settings = sublime.load_settings("OpenFiles.sublime-settings")
 
     def run(self, edit, path = None, tab = False):
-        self.__class__.active = True
-        self.__class__.window = self.view.window()
+        type(self).active = True
+        type(self).window = self.view.window()
         if not tab:
             self.open(path)
         else:
             self.tab_action()
     
     def tab_action(self):
-        self.__class__.window.run_command("hide_overlay")
+        type(self).window.run_command("hide_overlay")
 
         def on_done(index):
             if index == 0:
-                if self.__class__.index_highlighted > self.__class__.length_folders:
-                    subprocess.call(["explorer", self.__class__.path_current])
-                elif self.__class__.index_highlighted > 0:
-                    subprocess.call(["explorer", self.__class__.entries_path[self.__class__.index_highlighted - 1]])
-                elif self.__class__.index_highlighted == 0:
-                    subprocess.call(["explorer", self.__class__.path_parent])
+                if type(self).index_highlighted > type(self).length_folders:
+                    subprocess.call(["explorer", type(self).path_current])
+                elif type(self).index_highlighted > 0:
+                    subprocess.call(["explorer", type(self).entries_path[type(self).index_highlighted - 1]])
+                elif type(self).index_highlighted == 0:
+                    subprocess.call(["explorer", type(self).path_parent])
                 else:
                     pass
             elif index == -1:
@@ -55,9 +55,9 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
             else:
                 sublime.message_dialog('placeholder')
                 
-        command_list = [[command, self.__class__.entries_path[self.__class__.index_highlighted - 1]]
-            for command in self.__class__.command_list]
-        self.__class__.window.show_quick_panel(command_list, 
+        command_list = [[command, type(self).entries_path[type(self).index_highlighted - 1]]
+            for command in type(self).command_list]
+        type(self).window.show_quick_panel(command_list, 
             on_done)
 
     def open(self, path = None):
@@ -66,18 +66,18 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
 
         def on_done(index):
             # open files
-            if index > self.__class__.length_folders:
-                window.open_file(self.__class__.entries_path[index - 1])
+            if index > type(self).length_folders:
+                window.open_file(type(self).entries_path[index - 1])
             # open subdirectory
             elif index > 0:
-                window.run_command("open_files", {"path": self.__class__.entries_path[index - 1]})
+                window.run_command("open_files", {"path": type(self).entries_path[index - 1]})
             # open parent directory
             elif index == 0:
-                window.run_command("open_files", {"path": self.__class__.path_parent})
+                window.run_command("open_files", {"path": type(self).path_parent})
             else:
                 pass
                 # reset?
-        window.show_quick_panel(self.__class__.entries_display, on_done, sublime.MONOSPACE_FONT,
+        window.show_quick_panel(type(self).entries_display, on_done, sublime.MONOSPACE_FONT,
             0, OpenFilesCommand.on_highlighted)
 
 
@@ -88,18 +88,18 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
             entries = os.listdir(path)
         except FileNotFoundError as fnfe:
             sublime.error_message(str(fnfe))
-        self.__class__.path_current = path
-        self.__class__.path_parent = os.path.dirname(path)
+        type(self).path_current = path
+        type(self).path_parent = os.path.dirname(path)
         files = [file for file in entries if os.path.isfile(join(path, file))]
         folders = list(set(entries) - set(files))
-        self.__class__.length_folders = len(folders)
+        type(self).length_folders = len(folders)
         # can not place it in the global environment, because it run only once?
         ignored_extensions = tuple(self.settings.get("ignored_extensions", ()))
         # must after folders = list(set(entries) - set(files))
         files = [file for file in files if not file.lower().endswith(ignored_extensions)]
         folders_files = folders + files
-        self.__class__.entries_display = ['..'] + [folder + '/' for folder in folders] + files
-        self.__class__.entries_path = [join(path, folder_file) for folder_file in folders_files]
+        type(self).entries_display = ['..'] + [folder + '/' for folder in folders] + files
+        type(self).entries_path = [join(path, folder_file) for folder_file in folders_files]
 
 
 class OpenBookMarksCommand(sublime_plugin.TextCommand):
