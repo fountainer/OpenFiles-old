@@ -9,10 +9,11 @@ actions include "Open in Explorer", "Copy Path to Clipboard", "Copy Name
 to Clipboard" and "Open in Application". Open pdf files and Excel files.
 - Press `left` key in the quick panel to navigate back to file list when
 in menu list, back to parent directory when in file list.
+- Press `ctrl+alt+b` to show bookmarked folders in quick panel. Support 
+`left` and `right` key.
 
 ### ToDO
 
 - More tab actions.
-- Fix bookmarks tab action
 - [Sublime Files](https://packagecontrol.io/packages/Sublime%20Files)
 - [File navigator](https://packagecontrol.io/packages/File%20Navigator)

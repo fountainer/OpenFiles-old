@@ -170,26 +170,85 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
 
 
 class OpenBookMarksCommand(sublime_plugin.TextCommand):
+    active = False
+    index_highlighted = None
+    window = None
+
+    @classmethod
+    def reset(cls):
+        cls.active = False
+
     def __init__(self, view):
         sublime_plugin.TextCommand.__init__(self, view)
-        self.settings = sublime.load_settings("OpenFiles.sublime-settings")
+        settings = sublime.load_settings("OpenFiles.sublime-settings")
+        bookmarks = settings.get("bookmarks", [])
+        # window = sublime.active_window()
+        if bookmarks:
+            self.names_bm = [list(bookmark.keys())[0] for bookmark in bookmarks]
+            path_bm = [list(bookmark.values())[0] for bookmark in bookmarks]
+            pkg_path = sublime.packages_path()
+            path_bm = [path if os.path.isabs(path) else join(pkg_path, path) for path in path_bm]
+            self.path_bm = [path.replace("/", "\\") for path in path_bm]
+        else:
+            self.names_bm = None
+            self.path_bm = None
 
-    def run(self, edit):
-        bookmarks = self.settings.get("bookmarks", [])
-        if not bookmarks:
-            sublime.message_dialog("Empty bookmark")
-        names_bm = [list(bookmark.keys())[0] for bookmark in bookmarks]
-        path_bm = [list(bookmark.values())[0] for bookmark in bookmarks]
-        pkg_path = sublime.packages_path()
-        path_bm = [path if os.path.isabs(path) else join(pkg_path, path) for path in path_bm]
-        window = sublime.active_window()
+
+    def run(self, edit, key = None):
+        type(self).active = True
+        type(self).window = sublime.active_window()
+        if not key:
+            self.open()
+        elif key == "left":
+            self.backward()
+        elif key == "right":
+            self.tab_action()
+
+    def open(self):
+        def on_highlighted(index):
+            type(self).index_highlighted = index
 
         def on_done(index):
             if index >= 0:
-                window.run_command("open_files", {"path": path_bm[index]})
+                # do not use self.view, otherwise do not work after left key?
+                sublime.active_window().active_view().run_command(
+                    "open_files", {"path": self.path_bm[index]})
             else:
                 pass
-        window.show_quick_panel(names_bm, on_done)
+        # do not use self.view.window()
+        type(self).window.show_quick_panel(
+            self.names_bm, on_done, sublime.MONOSPACE_FONT, 0, on_highlighted)
+
+    def act_folder(self, index):
+        full_path = self.path_bm[type(self).index_highlighted]
+        if index == 0:
+            subprocess.call(["explorer", full_path])
+        elif index == 1:
+            sublime.set_clipboard(full_path)
+        elif index == 2:
+            sublime.set_clipboard(os.path.basename(full_path))
+        else:
+            # further path action
+            pass
+
+    def tab_action(self):
+        type(self).window.run_command("hide_overlay")
+        # must after type(self).window.run_command("hide_overlay")
+        # otherwise active become false. why?
+        type(self).active = True
+        action_folder = ["Open Folder in Explorer", "Copy Path to Clipboard", 
+                         "Copy Folder Name to Clipboard"]
+        action_list = [[action, self.path_bm[type(self).index_highlighted]] 
+            for action in action_folder]
+
+        on_done = self.act_folder
+
+        type(self).window.show_quick_panel(action_list, on_done)
+
+    def backward(self):
+        type(self).window.run_command("hide_overlay")
+        self.view.run_command("open_book_marks")
+
 
 
 class OpenFilesListener(sublime_plugin.EventListener):
@@ -200,14 +259,24 @@ class OpenFilesListener(sublime_plugin.EventListener):
         else:
             OpenFilesCommand.reset()
             sublime.quickPanelView = None
+        if group == -1 and index == -1 and OpenBookMarksCommand.active:
+            sublime.quickPanelViewBookMarks = view
+        else:
+            OpenBookMarksCommand.reset()
+            sublime.quickPanelViewBookMarks = None
 
     def on_query_context(self, view, key, operator, operand, match_all):
-        if (view == sublime.quickPanelView):
+        if view == sublime.quickPanelView:
             if key == "open_files_backward":
                 return True
             if not active_menu:
                 if key == "open_files_choose_menu":
                     return True
+        if view == sublime.quickPanelViewBookMarks:
+            if key == "open_book_marks_choose_menu":
+                return True
+            if key == "open_book_marks_backward":
+                return True
         return None
 
 class OpenFilesChooseMenuCommand(sublime_plugin.TextCommand):
@@ -218,3 +287,11 @@ class OpenFilesChooseMenuCommand(sublime_plugin.TextCommand):
 class OpenFilesBackwardCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.run_command("open_files", {"key": "left"})
+
+class OpenBookMarksChooseMenuCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.run_command("open_book_marks", {"key": "right"})
+
+class OpenBookMarksBackwardCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.run_command("open_book_marks", {"key": "left"})

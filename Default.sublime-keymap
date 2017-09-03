@@ -26,5 +26,15 @@
     "keys": ["left"],
     "command": "open_files_backward",
     "context": [{"key": "open_files_backward"}]
+  },
+  {
+    "keys": ["left"],
+    "command": "open_book_marks_backward",
+    "context": [{"key": "open_book_marks_backward"}]
+  },
+  {
+    "keys": ["right"],
+    "command": "open_book_marks_choose_menu",
+    "context": [{"key": "open_book_marks_choose_menu"}]
   }
 ]
