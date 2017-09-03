@@ -35,22 +35,21 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
         self.settings = sublime.load_settings("OpenFiles.sublime-settings")
 
     def run(self, edit, path = None, key = None, ignore = True):
-        print("@@@@", path, "@@@@")
         type(self).active = True
         # do not use self.view.window(), otherwise None for backward action
         type(self).window = sublime.active_window()
         if not key:
-            print("test")
             self.open(path, ignore)
         elif key == "right":
             self.tab_action()
         elif key == "left":
             self.backward()
+        else:
+            pass
     
     def tab_action(self):
         type(self).window.run_command("hide_overlay")
         type(self).active = True
-        # type(self).active_menu = True
         global active_menu
         active_menu = True
         if type(self).index_highlighted > type(self).length_folders:
@@ -68,7 +67,6 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
         else:
             # can not happen
             pass
-        print(active_menu)
         type(self).window.show_quick_panel(action_list, on_done)
 
     def act_folder(self, index):
@@ -96,10 +94,14 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
                 pdf_reader = self.settings.get("pdf_reader", "")
                 if pdf_reader:
                     subprocess.call([pdf_reader, full_path])
+                else:
+                    sublime.message_dialog("Please the path of pdf reader.")
             elif full_path.endswith((".csv", ".CSV", ".xslx", ".xsl")):
                 excel = self.settings.get("excel", "")
                 if excel:
                     subprocess.call([excel, full_path])
+                else:
+                    sublime.message_dialog("Please the path of Excel.")
             else:
                 # furthor 
                 pass
@@ -108,33 +110,28 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
             pass
 
     def open(self, path = None, ignore = True):
-        print("$$", path, "$$")
         global active_menu
         active_menu = False
         self.set_files_folders(path, ignore)
-        # window = self.view.window()
-        print(">>>>", self.view.id(), "<<<<<<")
-        print("---", type(self).window, "-----")
         def on_done(index):
             # open files
             if index > type(self).length_folders:
-                # delete index - 1
                 type(self).window.open_file(type(self).entries_path[index])
             # open subdirectory
             elif index > 0:
-                # delete - 1
-                print("not run")
-                print(type(self).entries_path[index])
-                print("^^^^", self.view.id(), "^^^^^^")
-                # subprocess.call(["explorer", type(self).entries_path[index]])
-                self.view.run_command("open_files", {"path": type(self).entries_path[index]})
-                print("run after")
+                # self.view.run_command("open_files", {"path": type(self).entries_path[index]})
+                # Can not use self.view, otherwise can not navigate into folder
+                # after backward action, because it's a quick panel view?
+                sublime.active_window().active_view().run_command(
+                    "open_files", {"path": type(self).entries_path[index]})
             # open parent directory
             elif index == 0:
-                self.view.run_command("open_files", {"path": type(self).path_parent})
+                sublime.active_window().active_view().run_command(
+                    "open_files", {"path": type(self).path_parent})
             else:
-                pass
                 # reset?
+                pass
+                
         type(self).window.show_quick_panel(type(self).entries_display, on_done, sublime.MONOSPACE_FONT,
             0, type(self).on_highlighted)
 
@@ -163,17 +160,13 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
             + [join(path, folder_file) for folder_file in folders_files]
 
     def backward(self):
-        print(sublime.quickPanelView.id(), self.view.id())
-        # print(type(self).active_menu)
+        type(self).active = True
+        # hide quick panel
         type(self).window.run_command("hide_overlay")
-        # check quick panel file view or menu view
-        print(active_menu)
         if active_menu:
             self.view.run_command("open_files", {"path": type(self).path_current})
-            print("menu is active")
         else:
-            print("file list")
-        # print(type(self).active_menu)
+            self.view.run_command("open_files", {"path": type(self).path_parent})
 
 
 class OpenBookMarksCommand(sublime_plugin.TextCommand):
@@ -202,7 +195,6 @@ class OpenBookMarksCommand(sublime_plugin.TextCommand):
 class OpenFilesListener(sublime_plugin.EventListener):
     def on_activated(self, view):
         group, index = view.window().get_view_index(view)
-        # print(group, index, OpenFilesCommand.active)
         if group == -1 and index == -1 and OpenFilesCommand.active:
             sublime.quickPanelView = view
         else:
@@ -218,11 +210,11 @@ class OpenFilesListener(sublime_plugin.EventListener):
                     return True
         return None
 
-class OpenFilesChooseMenu(sublime_plugin.TextCommand):
+class OpenFilesChooseMenuCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # path: current directory
         self.view.run_command("open_files", {"key": "right"})
 
-class OpenFilesBackward(sublime_plugin.TextCommand):
+class OpenFilesBackwardCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.run_command("open_files", {"key": "left"})

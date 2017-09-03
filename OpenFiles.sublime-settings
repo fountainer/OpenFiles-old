@@ -8,6 +8,6 @@
     {"LaTex Article": "D:/Projects/LaTex/Article"},
     {"Open Files - Sublime Package": "OpenFiles"},
   ],
-  "pdf_reader": "C:/Program Files/SumatraPDF/SumatraPDF.exe",
+  // "pdf_reader": "C:/Program Files/SumatraPDF/SumatraPDF.exe",
   "excel": "C:/Program Files (x86)/Microsoft Office/root/Office16/EXCEL.EXE"
 }
