@@ -13,11 +13,6 @@
     "command": "open_book_marks"
   },
   {
-    "keys": ["tab"],
-    "command": "open_files_choose_menu",
-    "context": [{"key": "open_files_choose_menu"}]
-  },
-  {
     "keys": ["right"],
     "command": "open_files_choose_menu",
     "context": [{"key": "open_files_choose_menu"}]
@@ -36,5 +31,10 @@
     "keys": ["right"],
     "command": "open_book_marks_choose_menu",
     "context": [{"key": "open_book_marks_choose_menu"}]
+  },
+  {
+    "keys": ["tab"],
+    "command": "open_files_show_hidden_files",
+    "context": [{"key": "open_files_show_hidden_files"}]
   }
 ]

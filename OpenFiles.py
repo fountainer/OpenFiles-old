@@ -41,13 +41,15 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
         if not key:
             self.open(path, ignore)
         elif key == "right":
-            self.tab_action()
+            self.choose_menu()
         elif key == "left":
             self.backward()
+        elif key == "ctrl":
+            self.show_hidden_files()
         else:
             pass
     
-    def tab_action(self):
+    def choose_menu(self):
         type(self).window.run_command("hide_overlay")
         type(self).active = True
         global active_menu
@@ -168,6 +170,13 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
         else:
             self.view.run_command("open_files", {"path": type(self).path_parent})
 
+    def show_hidden_files(self):
+        type(self).window.run_command("hide_overlay")
+        if not active_menu:
+            self.view.run_command(
+                "open_files",
+                {"path": type(self).path_current, "ignore": False})
+
 
 class OpenBookMarksCommand(sublime_plugin.TextCommand):
     active = False
@@ -202,7 +211,7 @@ class OpenBookMarksCommand(sublime_plugin.TextCommand):
         elif key == "left":
             self.backward()
         elif key == "right":
-            self.tab_action()
+            self.choose_menu()
 
     def open(self):
         def on_highlighted(index):
@@ -231,7 +240,7 @@ class OpenBookMarksCommand(sublime_plugin.TextCommand):
             # further path action
             pass
 
-    def tab_action(self):
+    def choose_menu(self):
         type(self).window.run_command("hide_overlay")
         # must after type(self).window.run_command("hide_overlay")
         # otherwise active become false. why?
@@ -272,6 +281,8 @@ class OpenFilesListener(sublime_plugin.EventListener):
             if not active_menu:
                 if key == "open_files_choose_menu":
                     return True
+            if key == "open_files_show_hidden_files" and not active_menu:
+                return True
         if view == sublime.quickPanelViewBookMarks:
             if key == "open_book_marks_choose_menu":
                 return True
@@ -295,3 +306,7 @@ class OpenBookMarksChooseMenuCommand(sublime_plugin.TextCommand):
 class OpenBookMarksBackwardCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.run_command("open_book_marks", {"key": "left"})
+
+class OpenFilesShowHiddenFiles(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.run_command("open_files", {"key": "ctrl"})
