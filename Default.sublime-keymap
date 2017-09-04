@@ -13,13 +13,28 @@
     "command": "open_book_marks"
   },
   {
-    "keys": ["tab"],
+    "keys": ["right"],
     "command": "open_files_choose_menu",
     "context": [{"key": "open_files_choose_menu"}]
   },
   {
+    "keys": ["left"],
+    "command": "open_files_backward",
+    "context": [{"key": "open_files_backward"}]
+  },
+  {
+    "keys": ["left"],
+    "command": "open_book_marks_backward",
+    "context": [{"key": "open_book_marks_backward"}]
+  },
+  {
     "keys": ["right"],
-    "command": "open_files_choose_menu",
-    "context": [{"key": "open_files_choose_menu"}]
+    "command": "open_book_marks_choose_menu",
+    "context": [{"key": "open_book_marks_choose_menu"}]
+  },
+  {
+    "keys": ["tab"],
+    "command": "open_files_show_hidden_files",
+    "context": [{"key": "open_files_show_hidden_files"}]
   }
 ]
