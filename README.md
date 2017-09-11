@@ -12,10 +12,13 @@ in menu list, back to parent directory when in file list.
 - Press `ctrl+alt+b` to show bookmarked folders in quick panel. Support 
 `left` and `right` key.
 - Press `tab` key in the quick panel to show hidden files.
+- Press `ctrl+alt+h` to show recent files
+- Press `ctrl+shift+alt+h` to show recent folders.
 
 ### ToDO
 
-- Showing history files and folders right actions do not work.
+- Make it work for linux.
+- Redundant code.
 - More `right` key actions.
 - [Sublime Files](https://packagecontrol.io/packages/Sublime%20Files)
 - [File navigator](https://packagecontrol.io/packages/File%20Navigator)
