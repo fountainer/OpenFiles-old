@@ -188,8 +188,8 @@ class OpenListCommand(sublime_plugin.TextCommand):
         cls.active = False
 
     def run(self, edit, key = None, list_type = None):
-        # type(self).active = True
         type(self).active = list_type
+        # type(self).active = True
         type(self).window = sublime.active_window()
         self.set_list(list_type)
         if not key:
@@ -197,12 +197,12 @@ class OpenListCommand(sublime_plugin.TextCommand):
         elif key == "left":
             self.backward(list_type)
         elif key == "right":
-            print("right:", type(self).active)
             self.choose_menu(list_type)
 
     def set_list(self, list_type = None):
+        settings = sublime.load_settings("OpenFiles.sublime-settings")
+        max_recent_items = settings.get("max_recent_items", 15)
         if list_type == "bookmarks":
-            settings = sublime.load_settings("OpenFiles.sublime-settings")
             bookmarks = settings.get("bookmarks", [])
             if bookmarks:
                 pkg_path = sublime.packages_path()
@@ -220,14 +220,14 @@ class OpenListCommand(sublime_plugin.TextCommand):
             session = self.get_session()
             # get()
             paths_list = session["settings"]["new_window_settings"]["file_history"]
-            # filter the files and folders that are alreadly deleted
             if paths_list:
-                paths_list = paths_list[0: min(15, len(paths_list))]
+                # change the string to path
                 paths_list = [path[1] + ":" + path[2:] for path in paths_list]
+                paths_list = [path for path in paths_list if os.path.exists(path)]
+                paths_list = paths_list[0: min(max_recent_items, len(paths_list))]
                 self.names_list = [[os.path.basename(path), os.path.dirname(path)] 
                     for path in paths_list]
                 # windows
-                # self.paths_list = [path.replace("/", "\\\\") for path in paths_list]
                 self.paths_list = paths_list
             else:
                 self.paths_list = None 
@@ -235,9 +235,11 @@ class OpenListCommand(sublime_plugin.TextCommand):
         elif list_type == "recent_folders":
             session = self.get_session()
             paths_list = session["folder_history"]
+
             if paths_list:
                 paths_list = [path[1] + ":" + path[2:] for path in paths_list]
-                paths_list = paths_list[0: min(15, len(paths_list))]
+                paths_list = [path for path in paths_list if os.path.exists(path)]
+                paths_list = paths_list[0: min(max_recent_items, len(paths_list))]
                 self.paths_list = paths_list
                 self.names_list = [[os.path.basename(path), path] 
                     for path in paths_list]
@@ -262,14 +264,13 @@ class OpenListCommand(sublime_plugin.TextCommand):
             if index >= 0:
                 # do not use self.view, otherwise do not work after left key?
                 full_path = self.paths_list[index]
-                print("full path", full_path)
                 if os.path.isfile(full_path):
                     sublime.active_window().open_file(full_path)
                 else:
                     sublime.active_window().active_view().run_command(
                         "open_files", {"path": full_path})
             else:
-                pass
+                type(self).reset()
         # do not use self.view.window()
         type(self).window.show_quick_panel(
             self.names_list, on_done, sublime.MONOSPACE_FONT, 0, on_highlighted)
@@ -278,7 +279,6 @@ class OpenListCommand(sublime_plugin.TextCommand):
         type(self).window.run_command("hide_overlay")
         # must after type(self).window.run_command("hide_overlay")?
         # otherwise active become false. why?
-        print("choose_menu():", list_type)
         type(self).active = list_type
         actions_folder = ["Open Folder in Explorer", "Copy Path to Clipboard", 
                          "Copy Folder Name to Clipboard"]
@@ -299,7 +299,7 @@ class OpenListCommand(sublime_plugin.TextCommand):
         path_current = os.path.dirname(full_path)
         if index == 0:
             # windows
-            full_path = full_path.replace("/", "\\")
+            path_current = path_current.replace("/", "\\")
             subprocess.call(["explorer", path_current])
         elif index == 1:
             sublime.set_clipboard(full_path)
@@ -353,22 +353,21 @@ class OpenFilesListener(sublime_plugin.EventListener):
         else:
             OpenFilesCommand.reset()
             sublime.quickPanelView = None
+        # capture three kinds of views
         if group == -1 and index == -1 and OpenListCommand.active == "bookmarks":
             sublime.quickPanelBookmarksView = view
         else:
-            OpenListCommand.reset()
             sublime.quickPanelBookmarksView = None
-        print("is recent file quick penal:", OpenListCommand.active)
         if group == -1 and index == -1 and OpenListCommand.active == "recent_files":
             sublime.quickPanelRecentFilesView = view
         else:
-            OpenListCommand.reset()
             sublime.quickPanelRecentFilesView = None
         if group == -1 and index == -1 and OpenListCommand.active == "recent_folders":
             sublime.quickPanelRecentFoldersView = view
         else:
-            OpenListCommand.reset()
             sublime.quickPanelRecentFoldersView = None
+        if OpenListCommand.active not in ("bookmarks", "recent_files", "recent_folders"):
+            OpenListCommand.reset()
 
     def on_query_context(self, view, key, operator, operand, match_all):
         if view == sublime.quickPanelView:
@@ -385,7 +384,6 @@ class OpenFilesListener(sublime_plugin.EventListener):
                 return True
             if key == "open_bookmarks_backward":
                 return True
-        print("RecentFiles:", view, sublime.quickPanelRecentFilesView)
         if view == sublime.quickPanelRecentFilesView:
             if key == "open_recent_files_choose_menu":
                 return True
@@ -397,7 +395,6 @@ class OpenFilesListener(sublime_plugin.EventListener):
             if key == "open_recent_folders_backward":
                 return True
         return None
-
 
 
 class OpenFilesChooseMenuCommand(sublime_plugin.TextCommand):
