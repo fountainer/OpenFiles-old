@@ -15,6 +15,7 @@ in menu list, back to parent directory when in file list.
 
 ### ToDO
 
+- Showing history files and folders right actions do not work.
 - More `right` key actions.
 - [Sublime Files](https://packagecontrol.io/packages/Sublime%20Files)
 - [File navigator](https://packagecontrol.io/packages/File%20Navigator)

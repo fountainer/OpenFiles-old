@@ -4,9 +4,9 @@
   ".log"],
   "bookmarks":
   [
-    {"R Code": "D:/Projects/R code"},
-    {"LaTex Article": "D:/Projects/LaTex/Article"},
-    {"Open Files - Sublime Package": "OpenFiles"},
+    "D:/Projects/R code",
+    "D:/Projects/LaTex/Article",
+    "OpenFiles"
   ],
   "pdf_reader": "C:/Program Files/SumatraPDF/SumatraPDF.exe",
   "excel": "C:/Program Files (x86)/Microsoft Office/root/Office16/EXCEL.EXE"

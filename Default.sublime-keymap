@@ -10,7 +10,8 @@
   },
   {
     "keys": ["ctrl+alt+b"],
-    "command": "open_book_marks"
+    "command": "open_list",
+    "args": {"list_type": "bookmarks"}
   },
   {
     "keys": ["right"],
@@ -24,17 +25,48 @@
   },
   {
     "keys": ["left"],
-    "command": "open_book_marks_backward",
-    "context": [{"key": "open_book_marks_backward"}]
+    "command": "open_bookmarks_backward",
+    "context": [{"key": "open_bookmarks_backward"}]
   },
   {
     "keys": ["right"],
-    "command": "open_book_marks_choose_menu",
-    "context": [{"key": "open_book_marks_choose_menu"}]
+    "command": "open_bookmarks_choose_menu",
+    "context": [{"key": "open_bookmarks_choose_menu"}]
   },
   {
     "keys": ["tab"],
     "command": "open_files_show_hidden_files",
+    // further 
     "context": [{"key": "open_files_show_hidden_files"}]
-  }
+  },
+  {
+    "keys": ["ctrl+alt+h"],
+    "command": "open_list",
+    "args": {"list_type": "recent_files"}
+  },
+  {
+    "keys": ["left"],
+    "command": "open_recent_files_backward",
+    "context": [{"key": "open_recent_files_backward"}]
+  },
+  {
+    "keys": ["right"],
+    "command": "open_recent_files_choose_menu",
+    "context": [{"key": "open_recent_files_choose_menu"}]
+  },
+  {
+    "keys": ["ctrl+shift+alt+h"],
+    "command": "open_list",
+    "args": {"list_type": "recent_folders"}
+  },
+  {
+    "keys": ["left"],
+    "command": "open_recent_folders_backward",
+    "context": [{"key": "open_recent_folders_backward"}]
+  },
+  {
+    "keys": ["right"],
+    "command": "open_recent_folders_choose_menu",
+    "context": [{"key": "open_recent_folders_choose_menu"}]
+  },
 ]
