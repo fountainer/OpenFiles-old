@@ -17,6 +17,7 @@ in menu list, back to parent directory when in file list.
 
 ### ToDO
 
+- Open input panel, create file or folder (when opening input panel, set active false)
 - Make it work for linux.
 - Redundant code.
 - More `right` key actions.

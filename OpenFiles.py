@@ -12,8 +12,8 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
     command_list = ["Open in Explorer", "Placeholder"]
     action_folder = ["Open Folder in Explorer", "Copy Path to Clipboard", 
                      "Copy Folder Name to Clipboard"]
-    action_file = ["Open Containing Folder", "Copy File Path to Clipboard", 
-                   "Copy File Name to Clipboard", "Open with Application"]
+    action_file = ["Copy File Path to Clipboard", "Copy File Name to Clipboard", 
+                   "Open with Application"]
     window = None
     entries_path = None
     entries_display = None
@@ -55,7 +55,7 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
         type(self).active = True
         global active_menu
         active_menu = True
-        if type(self).index_highlighted > type(self).length_folders:
+        if type(self).index_highlighted > type(self).length_folders + 1:
             # action list for file
             action_list = [[action, type(self).entries_path[type(self).index_highlighted]]
                 for action in type(self).action_file]
@@ -81,18 +81,15 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
         elif index == 2:
             sublime.set_clipboard(os.path.basename(full_path))
         else:
-            # further path action
-            pass
+            type(self).reset()
 
     def act_file(self, index):
         full_path = type(self).entries_path[type(self).index_highlighted]
         if index == 0:
-            subprocess.call(["explorer", type(self).path_current])
-        elif index == 1:
             sublime.set_clipboard(full_path)
-        elif index == 2:
+        elif index == 1:
             sublime.set_clipboard(os.path.basename(full_path))
-        elif index == 3:
+        elif index == 2:
             if full_path.endswith(".pdf"):
                 pdf_reader = self.settings.get("pdf_reader", "")
                 if pdf_reader:
@@ -106,11 +103,9 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
                 else:
                     sublime.message_dialog("Please the path of Excel.")
             else:
-                # furthor 
-                pass
+                sublime.message_dialog("No Application to Open this Type of File.") 
         else:
-            # further file action
-            pass
+            type(self).reset()
 
     def open(self, path = None, ignore = True):
         global active_menu
@@ -118,7 +113,7 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
         self.set_files_folders(path, ignore)
         def on_done(index):
             # open files
-            if index > type(self).length_folders:
+            if index > type(self).length_folders + 1:
                 type(self).window.open_file(type(self).entries_path[index])
             # open subdirectory
             elif index > 0:
@@ -158,8 +153,8 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
             files = [file for file in files if not file.lower().endswith(ignored_extensions)]
         
         folders_files = folders + files
-        type(self).entries_display = ['..'] + [folder + '/' for folder in folders] + files
-        type(self).entries_path = [type(self).path_parent] \
+        type(self).entries_display = ['..', '.'] + [folder + '/' for folder in folders] + files
+        type(self).entries_path = [type(self).path_parent] + [type(self).path_current] \
             + [join(path, folder_file) for folder_file in folders_files]
 
     def backward(self):
