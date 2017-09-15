@@ -14,10 +14,12 @@ in menu list, back to parent directory when in file list.
 - Press `tab` key in the quick panel to show hidden files.
 - Press `ctrl+alt+h` to show recent files
 - Press `ctrl+shift+alt+h` to show recent folders.
+- Create new file/folder in right key actions.
 
 ### ToDO
 
-- Open input panel, create file or folder (when opening input panel, set active false)
+- Inherit from `WindowCommand`.
+- Use [send2trash](https://github.com/hsoft/send2trash/blob/master/send2trash/plat_win.py)
 - Make it work for linux.
 - Redundant code.
 - More `right` key actions.

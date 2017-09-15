@@ -11,7 +11,7 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
     index_highlighted = 0
     command_list = ["Open in Explorer", "Placeholder"]
     action_folder = ["Open Folder in Explorer", "Copy Path to Clipboard", 
-                     "Copy Folder Name to Clipboard"]
+                     "Copy Folder Name to Clipboard", "New File"]
     action_file = ["Copy File Path to Clipboard", "Copy File Name to Clipboard", 
                    "Open with Application"]
     window = None
@@ -80,8 +80,47 @@ class OpenFilesCommand(sublime_plugin.TextCommand):
             sublime.set_clipboard(full_path)
         elif index == 2:
             sublime.set_clipboard(os.path.basename(full_path))
+        elif index == 3:
+            self.create_file(full_path)
         else:
             type(self).reset()
+
+    def create_file(self, path):
+        type(self).active = False
+
+        def on_done(text):
+            text = text.replace("/", "\\")
+            text = os.path.join(path, text)
+            if text.endswith("\\"):
+                os.makedirs(text, exist_ok = True)
+            else:
+                new_path = os.path.dirname(text)
+                os.makedirs(new_path, exist_ok = True)
+                if not os.path.exists(text):
+                    open(text, "w").close()
+                    sublime.active_window().open_file(text)
+                else:
+                    if os.path.isdir(text):
+                        sublime.error_message(
+                            'Folder: "{}" has already existed!'.format(text))
+                    else:
+                        res_dialog = sublime.yes_no_cancel_dialog(
+                            'File: "{}" has already existed!'.format(text),
+                            "Overwrite It!", "Open It")
+                        if res_dialog == sublime.DIALOG_YES:
+                            open(text, "w").close()
+                            sublime.active_window().open_file(text)
+                        elif res_dialog == sublime.DIALOG_NO:
+                            sublime.active_window().open_file(text)
+                        else:
+                            pass
+
+        def on_change(text):
+            text = text.replace("/", "\\")
+            text = os.path.join(path, text)
+            sublime.active_window().status_message(text)
+
+        sublime.active_window().show_input_panel("New", "", on_done, on_change, None)
 
     def act_file(self, index):
         full_path = type(self).entries_path[type(self).index_highlighted]
